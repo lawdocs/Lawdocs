@@ -4,6 +4,9 @@ import Home from "./Pages/Home";
 import About from "./Pages/About";
 // import LocomotiveScroll from "locomotive-scroll";
 import Blogs from "./Pages/Blogs/Blogs";
+import BlogsDetails from "./Pages/Blogs/BlogsDetails";
+import  Team  from "./Pages/Team/Team";
+import TeamDetails from "./Pages/Team/TeamDetails";
 import  Layout  from "./Layout/Layout";
 import SignUp from "./Pages/Auth/Signup";
 import SignIn from "./Pages/Auth/SignIn";
@@ -34,6 +37,9 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/blogs" element={<Blogs />} />
+              <Route path="/blogs-Details" element={<BlogsDetails />} />
+              <Route path="/team" element={<Team />} />
+              <Route path="/team-details" element={<TeamDetails/>} />
             </Route>
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
