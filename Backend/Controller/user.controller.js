@@ -3,7 +3,6 @@ import User from '../model/user.model.js'
 export const saveUser=async (req,res)=>{
 try{
 
-
     const {clerkId,email,username,password,phoneNumber,ImageUrl} = req.body
     console.log("daatat",clerkId, );
     console.log("daatat",email, );
@@ -19,7 +18,6 @@ try{
               clerkId,
               email,
               username,
-              password,
               phoneNumber,
             });
             await user.save()
@@ -31,3 +29,4 @@ try{
 
 
 }
+

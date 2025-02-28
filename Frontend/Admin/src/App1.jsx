@@ -8,6 +8,8 @@ import BlogList from "./pages/Blog/BlogList";
 import EditBlog from "./pages/Blog/EditBlog";
 import AddBlog from "./pages/Blog/AddBlog";
 import PendingBlog from "./pages/Blog/PendingBlog";
+import BlogCommentList from "./pages/Blog/BlogCommentList";
+import BlogDescription from "./pages/Blog/BlogDescription";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
@@ -82,6 +84,11 @@ const Sidebar = () => {
             <Route path="/edit-blog/:id" element={<EditBlog />} />
             <Route path="/addblog" element={<AddBlog />} />
             <Route path="/pending-blogs" element={<PendingBlog />} />
+            <Route
+              path="/blog/:id/comments"
+              element={<BlogCommentList />}
+            />
+            <Route path="/blog/:id/description" element={<BlogDescription />} />
           </Routes>
         </div>
       </div>

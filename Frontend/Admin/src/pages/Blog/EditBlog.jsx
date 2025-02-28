@@ -19,7 +19,7 @@ const EditBlog = () => {
     const fetchBlog = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/blogs/getBlog/${id}`
+          `${import.meta.env.VITE_API_BASE_URL}/blogs/getBlog/${id}`
         );
         console.log("edit  blog", response);
         setBlog(response.data.blog);
@@ -40,7 +40,10 @@ const EditBlog = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:3000/blogs/update/${id}`, blog);
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/blogs/update/${id}`,
+        blog
+      );
       navigate("/blog-list"); // Redirect to the blog list after saving
     } catch (error) {
       console.error("Error updating blog:", error);
@@ -82,12 +85,12 @@ const EditBlog = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm  font-medium mb-2">Description</label>
           <textarea
             name="description"
-            value={blog.description}
+            value={blog.description.replace(/<[^>]+>/g, "")} // Remove HTML tags for editing
             onChange={handleChange}
-            className="border px-3 py-2 rounded w-full"
+            className="border px-3 py-2 h-[20vw] rounded w-full"
           />
         </div>
         <div className="mb-4">

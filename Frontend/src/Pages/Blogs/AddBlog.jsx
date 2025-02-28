@@ -6,6 +6,7 @@ import "react-quill/dist/quill.snow.css";
 import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const AddBlog = () => {
   const [blogData, setBlogData] = useState({
@@ -20,6 +21,7 @@ const AddBlog = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userId } = useAuth();
+  const navigate = useNavigate(); // Initialize navigate
 
   const validateForm = () => {
     let tempErrors = {};
@@ -38,7 +40,7 @@ const AddBlog = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBlogData({ ...blogData, [name]: value });
-    setErrors({ ...errors, [name]: "" }); // Remove error when user types
+    setErrors({ ...errors, [name]: "" });
   };
 
   const handleImageChange = (e) => {
@@ -69,15 +71,23 @@ const AddBlog = () => {
     formData.append("createdBy", userId);
 
     try {
-      const res = await axios.post(
-        "http://localhost:3000/blogs/createblog",
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/blogs/createblog`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      toast.success("Blog added successfully!", { position: "top-right" });
-      console.log("res",res);
+
+      toast.success("Blog request sent for approval!", {
+        position: "top-right",
+      });
+
+      // Navigate to /blogs after 2 seconds to show the toast
+      setTimeout(() => {
+        navigate("/blogs");
+      }, 2000);
+
       setBlogData({
         category: "",
         name: "",
@@ -93,21 +103,6 @@ const AddBlog = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const modules = {
-    toolbar: [
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      [{ font: [] }],
-      [{ size: ["small", false, "large", "huge"] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ color: [] }, { background: [] }],
-      [{ align: [] }],
-      ["blockquote", "code-block"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["link", "image", "video"],
-      ["clean"],
-    ],
   };
 
   return (
@@ -160,7 +155,6 @@ const AddBlog = () => {
           <ReactQuill
             value={blogData.description}
             onChange={handleEditorChange}
-            modules={modules}
             className="bg-white rounded-lg h-[300px]"
           />
           {errors.description && (

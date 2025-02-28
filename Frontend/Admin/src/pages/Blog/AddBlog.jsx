@@ -72,7 +72,7 @@ const AddBlog = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/blogs/createblog",
+        `${import.meta.env.VITE_API_BASE_URL}/blogs/createblog`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

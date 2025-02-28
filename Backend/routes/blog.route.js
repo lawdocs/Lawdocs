@@ -17,10 +17,10 @@ router.post('/createblog',upload.single('image'),CreateBlog)
 router.get("/getBlogs", getPendingBlogs);
 router.get('/getBlog/:id',getBlog)
 router.put('/update/:id',updateBlog)
-router.delete('/delete/:id',deleteBlog)
+router.delete('/delete/:id',deleteBlog) 
 router.put("/updateStatus/:id",updateBlogStatus);
-router.get('getAllBlogs',getAllBlogs)
-router.get("getApprovedBlogs", getApprovedBlogs);
+router.get('/getAllBlogs',getAllBlogs)
+router.get("/getApprovedBlogs", getApprovedBlogs);
 
 
 export default router

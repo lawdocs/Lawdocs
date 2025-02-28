@@ -5,12 +5,14 @@ import User from "../model/user.model.js";
 import cloudinary from "../utils/Cloudinary.js";
 
 // cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET,
+//   cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key:process.env.CLOUDINARY_API_KEY,
+//   api_secret:process.env.CLOUDINARY_API_SECRET,
 // });
 
 const uploadToCloudinary = (buffer) => {
+
+
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       { folder: "blogs" }, // Cloudinary folder (optional)
@@ -75,9 +77,9 @@ export const getApprovedBlogs = async (req, res) => {
     const approvedBlogs = await Blog.find({ status: "approved" });
     res
       .status(200)
-      .json({ message: "Pending blogs fetched successfully", approvedBlogs });
+      .json({ message: "Approved blogs fetched successfully", approvedBlogs });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching pending blogs", error });
+    res.status(500).json({ message: "Error fetching Approved blogs", error });
   }
 };
 export const getAllBlogs = async (req, res) => {
@@ -85,9 +87,9 @@ export const getAllBlogs = async (req, res) => {
     const   Blogs = await Blog.find();
     res
       .status(200)
-      .json({ message: "Pending blogs fetched successfully", Blogs });
+      .json({ message: "All blogs fetched successfully", Blogs });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching pending blogs", error });
+    res.status(500).json({ message: "Error fetching All blogs", error });
   }
 };
 export const getBlog = async (req, res) => {
@@ -97,7 +99,7 @@ export const getBlog = async (req, res) => {
     const blog = await Blog.findById(id);
     res
       .status(200)
-      .json({ message: "Pending blogs fetched successfully", blog });
+      .json({ message: "Particular blog fetched successfully", blog });
   } catch (error) {
     res.status(500).json({ message: "Error fetching pending blogs", error });
   }
@@ -128,6 +130,20 @@ export const updateBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
   try {
     const { id } = req.params;
+    const blog = await Blog.findById(id);
+
+    // Extract the public ID from the Cloudinary URL
+    const imageUrl = blog.image; // Cloudinary URL
+    const publicId = imageUrl.split("/").pop().split(".")[0]; // Extract public ID
+
+    // Delete the image from Cloudinary
+    await cloudinary.uploader.destroy(`blogs/${publicId}`, (error, result) => {
+      if (error) {
+        console.error("Cloudinary deletion error:", error);
+      } else {
+        console.log("Cloudinary image deleted:", result);
+      }
+    });
     const deletedBlog = await Blog.findByIdAndDelete(id);
 
     if (!deletedBlog) {
