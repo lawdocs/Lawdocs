@@ -54,13 +54,23 @@ function BlogSection() {
           ))}
         </div>
         {/* Read More Button */}
-        <div className="mt-10 flex justify-center">
-          <Link
-            to="/blogs"
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition-transform duration-300 shadow-md hover:scale-110"
-          >
-            Read More
-          </Link>
+        <div className="flex gap-[2vw] w-full justify-center">
+          <div className="mt-10 flex justify-center">
+            <Link
+              to="/blogs"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition-transform duration-300 shadow-md hover:scale-110"
+            >
+              Read More
+            </Link>
+          </div>
+          <div className="mt-10 flex justify-center">
+            <Link
+              to="/addblogs"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition-transform duration-300 shadow-md hover:scale-110"
+            >
+              Add Blog
+            </Link>
+          </div>
         </div>
       </div>
     </section>

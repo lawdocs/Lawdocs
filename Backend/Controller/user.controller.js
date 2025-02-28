@@ -19,7 +19,6 @@ try{
               clerkId,
               email,
               username,
-              password,
               phoneNumber,
             });
             await user.save()
@@ -31,3 +30,4 @@ try{
 
 
 }
+
