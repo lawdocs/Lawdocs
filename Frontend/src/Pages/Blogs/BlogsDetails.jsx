@@ -43,9 +43,11 @@ const BlogDetails = () => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/comments`
+          `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/getAllComments`
         );
-        setComments(response.data.comments); // Assuming the API returns an array of comments
+        const filteredComments=response.data.filter((comment)=>comment.status==="approved")
+        console.log("resssu", response.data);
+        setComments(filteredComments); // Assuming the API returns an array of comments
       } catch (err) {
         console.error("Failed to fetch comments:", err);
       }
@@ -290,7 +292,7 @@ const BlogDetails = () => {
                               {comment.name}
                             </h4>
                             <p className="text-sm text-gray-600">
-                              {new Date(comment.date).toLocaleDateString()}
+                              {new Date(comment.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>

@@ -28,9 +28,9 @@ function App() {
 
   // Check if the user is an admin
   const isAdmin = user?.publicMetadata?.role === "admin";
-  if (isAdmin) {
-    return <App1 />;
-  }
+  // if (isAdmin) {
+  //   return <App1 />;
+  // }
 
 
   return (
