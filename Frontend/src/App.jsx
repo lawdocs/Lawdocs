@@ -13,6 +13,7 @@ import  Layout  from "./Layout/Layout";
 // import VerifyEmail from "./Pages/Auth/VerifyEmail";
 import App1 from '../../Frontend/Admin/src/App1'
 import AddBlog from "./Pages/Blogs/AddBlog";
+import ScrollToTop from './ScrollToTop.jsx'
 
 function ProtectedRoute({children}){
   const {isSignedIn} =useUser();
@@ -35,6 +36,8 @@ function App() {
   return (
     <div ref={scrollRef} className="min-h-[100vh] overflow-hidden">
       <Router>
+      <ScrollToTop/>
+      
         <main className="flex-grow">
           <Routes>
             {/* Public Route (Accessible to Everyone) */}

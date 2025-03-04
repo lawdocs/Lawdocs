@@ -3,13 +3,13 @@ import { gsap } from "gsap";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import BlogCategories from "./pages/Blog/BlogCategories";
-import BlogComments from "./pages/Blog/BlogComment";
 import BlogList from "./pages/Blog/BlogList";
 import EditBlog from "./pages/Blog/EditBlog";
 import AddBlog from "./pages/Blog/AddBlog";
 import PendingBlog from "./pages/Blog/PendingBlog";
 import BlogCommentList from "./pages/Blog/BlogCommentList";
 import BlogDescription from "./pages/Blog/BlogDescription";
+import PendingComments from "./pages/Blog/PendingComments";
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
@@ -79,11 +79,11 @@ const Sidebar = () => {
         >
           <Routes>
             <Route path="/blog-categories" element={<BlogCategories />} />
-            <Route path="/blog-comments" element={<BlogComments />} />
             <Route path="/blog-list" element={<BlogList />} />
             <Route path="/edit-blog/:id" element={<EditBlog />} />
             <Route path="/addblog" element={<AddBlog />} />
             <Route path="/pending-blogs" element={<PendingBlog />} />
+            <Route path="/pending-comments/:id" element={<PendingComments/>} />
             <Route
               path="/blog/:id/comments"
               element={<BlogCommentList />}

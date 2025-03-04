@@ -185,3 +185,159 @@ export const updateBlogStatus=async (req,res)=>{
 
   
 }
+
+export const addComments=async(req,res)=>{
+  try {
+    const {email,name,comment}=req.body;
+
+    const blog=await Blog.findById(req.params.id)
+    if(!blog){
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const newcomment={
+      name,
+      email,
+      comment,
+      status:"pending"
+
+    }
+
+    blog.comments.push(newcomment)
+    await blog.save()
+    console.log("blog",blog);
+
+    res.status(201).json({message:"Comment added Succesful .pending approval"})
+
+  } catch (error) {
+    res.status(500).json({ message: "Error adding comments", error });
+  }
+
+}
+
+export const getApprovedComments=async(req,res)=>{
+  
+   try {
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const approvedComments = blog.comments.filter(comment => comment.status === "approved");
+    res.json(approvedComments);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+
+}
+export const getAllComments=async(req,res)=>{
+  
+   try {
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const Comments = blog.comments;
+    res.json(Comments);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+
+}
+
+export const updateComment = async (req, res) => {
+  try {
+    const { blogId,commentId } = req.params;
+    const { name, email,comment } = req.body;
+    console.log("name",name);
+    console.log("email",email);
+    console.log("comment",comment);
+    console.log("blogId",blogId);
+    console.log("commentId",commentId);
+
+    const updatedComment = await Blog.findOneAndUpdate(
+      {_id:blogId,"comments._id":commentId},
+      
+
+      {
+        $set: {
+          "comments.$.name": name,
+          "comments.$.email": email,
+          "comments.$.comment": comment,
+        }
+      },
+      { new: true }
+    );
+if (!blogId || !commentId) {
+  return res
+    .status(400)
+    .json({ message: "Blog ID and Comment ID are required" });
+}
+    if (!updatedComment) {
+      return res.status(404).json({ message: "Blog or Comment not found" });
+    }
+
+    res.status(200).json({ message: "Comment updated successfully", updatedComment });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating Comment", error });
+  }
+};
+export const approveComment = async (req, res) => {
+  try {
+    const { blogId,commentId } = req.params;
+   
+
+    const updatedComment = await Blog.findOneAndUpdate(
+      { _id: blogId, "comments._id": commentId },
+
+      {
+        $set: {
+          "comments.$.status": "approved",
+        },
+      },
+      { new: true }
+    );
+if (!blogId || !commentId) {
+  return res
+    .status(400)
+    .json({ message: "Blog ID and Comment ID are required" });
+}
+    if (!updatedComment) {
+      return res.status(404).json({ message: "Blog or Comment not found" });
+    }
+
+    res.status(200).json({ message: "Comment updated successfully", updatedComment });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating Comment", error });
+  }
+};
+
+export const deleteComment = async (req, res) => {
+  try {
+    const { blogId, commentId } = req.params;
+
+    if (!blogId || !commentId) {
+      return res
+        .status(400)
+        .json({ message: "Blog ID and Comment ID are required" });
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      blogId,
+      { $pull: { comments: { _id: commentId } } }, // Remove the comment from the array
+      { new: true }
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).json({ message: "Blog or Comment not found" });
+    }
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting comment", error });
+  }
+};
+

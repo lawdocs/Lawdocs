@@ -1,4 +1,22 @@
 import mongoose from "mongoose";
+const commentSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    comment: {
+      type: String,
+      required: true,
+    },
+    status: { type: String, enum: ["pending", "approved"], default: "pending" },
+  },
+  { timestamps: true }
+);
 
 const BlogSchema = new mongoose.Schema(
   {
@@ -13,6 +31,7 @@ const BlogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    comments:[commentSchema],
     date: { type: String, required: true }, // Reference to the User
   },
   { timestamps: true }
