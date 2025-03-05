@@ -4,7 +4,7 @@ function BannerComponent2() {
   return (
     <div
       style={{
-        backgroundImage: "url('src/assets/Banner/Banner9.webp')",
+        backgroundImage: "url('public/assets/Banner/Banner9.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

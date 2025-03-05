@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 
 const EditBlog = () => {
   const { id } = useParams(); // Get the blog ID from the URL
@@ -49,9 +50,18 @@ const EditBlog = () => {
       console.error("Error updating blog:", error);
     }
   };
+  function handleGoBack(){
+    navigate(-1)
+  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+     <button
+                    onClick={handleGoBack}
+                    className="mb-4 ml-[2vw] bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-all duration-300"
+                  >
+                    <FaArrowLeft /> Go Back
+                  </button>
       <h1 className="text-2xl font-bold mb-4">Edit Blog</h1>
       <div className="bg-white p-6 rounded shadow-md">
         <div className="mb-4">

@@ -70,7 +70,7 @@ function Work() {
               {[...companyNames, ...companyNames].map((logo, index) => (
                 <img
                   key={index}
-                  src={`/src/assets/Clients/${logo}.png`}
+                  src={`public/assets/Clients/${logo}.png`}
                   alt={logo}
                   className="object-contain w-20 md:w-28 h-14 md:h-20 opacity-80 hover:opacity-100 transition mx-4"
                 />

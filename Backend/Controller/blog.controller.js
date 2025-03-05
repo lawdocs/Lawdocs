@@ -191,6 +191,7 @@ export const addComments=async(req,res)=>{
     const {email,name,comment}=req.body;
 
     const blog=await Blog.findById(req.params.id)
+    console.log("blog",blog);
     if(!blog){
       return res.status(404).json({ message: "Blog not found" });
     }
@@ -200,10 +201,10 @@ export const addComments=async(req,res)=>{
       email,
       comment,
       status:"pending"
-
     }
 
     blog.comments.push(newcomment)
+    console.log("blog comments",blog);
     await blog.save()
     console.log("blog",blog);
 
@@ -234,14 +235,18 @@ export const getApprovedComments=async(req,res)=>{
 export const getAllComments=async(req,res)=>{
   
    try {
-    const blog = await Blog.findById(req.params.id);
+    const {status}=req.query
+    const blog = await Blog.findById(req.params.id).select('comments');
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    const Comments = blog.comments;
-    res.json(Comments);
+    let comments = blog.comments;
+    if(status){
+      comments=comments.filter((comment)=>comment.status==status)
+    }
+    res.json(comments);
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -288,7 +293,6 @@ if (!blogId || !commentId) {
 export const approveComment = async (req, res) => {
   try {
     const { blogId,commentId } = req.params;
-   
 
     const updatedComment = await Blog.findOneAndUpdate(
       { _id: blogId, "comments._id": commentId },

@@ -2,9 +2,8 @@
   import { Button } from "../ui/button";
   import { Menu, X, ChevronDown } from "lucide-react";
   import { Link } from "react-router-dom";
-  import { motion } from "framer-motion";
-  import companylogo from "../../assets/Logo/LawdocsLogo4.png";
-  import {  SignIn,useAuth,useClerk,useSession,useUser , } from "@clerk/clerk-react";
+  import companylogo from "../../../public/assets/Logo/LawdocsLogo4.png";
+  import {  useAuth,useClerk,useUser , } from "@clerk/clerk-react";
   import axios from 'axios'
   import {
     SignedIn,

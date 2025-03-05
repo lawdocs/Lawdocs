@@ -13,14 +13,12 @@ const PendingComments = () => {
   const fetchComments = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/getAllComments`
+        `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/getAllComments?status=pending`
       );
       // Filter comments to show only those with status "pending"
-      const filteredComments = response.data.filter(
-        (comment) => comment.status === "pending"
-      );
+   
       console.log("ress", response);
-      setPendingComments(filteredComments);
+      setPendingComments(response.data);
     } catch (error) {
       console.error("Error fetching comments:", error);
     }

@@ -1,4 +1,5 @@
 import User from '../model/user.model.js'
+import axios from 'axios'
 
 export const saveUser=async (req,res)=>{
 try{
@@ -27,6 +28,21 @@ try{
         res.status(500).json({message:"Error saving user",error})
     }
 
+
+}
+
+export const getUser=async (req,res)=>{
+
+    try {
+      const response = await axios.get("https://api.clerk.com/v1/users", {
+        headers: {
+          Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        },
+      });
+      res.json(response.data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
 
 }
 

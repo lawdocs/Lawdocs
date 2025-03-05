@@ -9,6 +9,7 @@
       FaBars,
       FaEdit,
       FaTimes,
+      FaArrowLeft,
     } from "react-icons/fa";
 
     const BlogCommentList = () => {
@@ -100,9 +101,19 @@
       function viewpendingcomments(){
         navigate(`/pending-comments/${blogId}`);
       }
+      function handleGoBack(){
+        navigate(-1)
+
+      }
 
       return (
         <div className="p-4 bg-gray-100 min-h-screen">
+          <button
+                onClick={handleGoBack}
+                className="mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-all duration-300"
+              >
+                <FaArrowLeft /> Go Back
+              </button>
           {/* Notification Bar */}
           <div className="bg-yellow-200 p-3 mb-4 rounded flex justify-between items-center">
             <span>
