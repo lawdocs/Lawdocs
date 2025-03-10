@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,14 +19,10 @@ const BlogDetails = () => {
   // Fetch blog data from the API
   useEffect(() => {
     const fetchBlog = async () => {
-      console.log("id", id);
       try {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/getBlog/${id}`
         );
-        console.log("ruuu", response); // Replace with your API endpoint
-
-        console.log("res", response.data.blog);
         setBlog(response.data.blog);
       } catch (err) {
         setError(err.message);
@@ -45,9 +41,10 @@ const BlogDetails = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/getAllComments`
         );
-        const filteredComments=response.data.filter((comment)=>comment.status==="approved")
-        console.log("resssu", response.data);
-        setComments(filteredComments); // Assuming the API returns an array of comments
+        const filteredComments = response.data.filter(
+          (comment) => comment.status === "approved"
+        );
+        setComments(filteredComments);
       } catch (err) {
         console.error("Failed to fetch comments:", err);
       }
@@ -66,14 +63,12 @@ const BlogDetails = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Replace with your API endpoint for submitting comments
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/blogs/${id}/createComment`,
         comment
       );
       toast.success("Comment submitted successfully!");
       setComment({ name: "", email: "", comment: "" });
-      // Refresh comments after submission
     } catch (err) {
       toast.error("Failed to submit comment. Please try again.");
     }
@@ -131,18 +126,12 @@ const BlogDetails = () => {
   if (!blog) return <p>Blog not found</p>;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative h-96 mt-2">
-        <img
-          src={blog.image}
-          alt="Hero Image"
-          className="w-full h-full object-contain"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-          <h1 className="text-4xl md:text-4xl font-bold text-white text-center mb-4">
-            {blog.name || "RBI REGULATED ENTITIES (BANKS, NBFCs, HFCs)"}
-          </h1>
+      <div className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-5xl font-bold mb-4">{blog.name}</h1>
+          <p className="text-lg">Published on: {blog.date}</p>
         </div>
       </div>
 
@@ -151,28 +140,19 @@ const BlogDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Side - Blog Details */}
           <div className="lg:col-span-2">
-            <div className="bg-white shadow-lg rounded-lg p-6">
+            <div className="bg-white rounded-lg shadow-xl p-8">
               {/* Author Section */}
               <div className="flex items-center space-x-4 mb-6">
                 <img
                   src={blog.image}
                   alt={blog.name}
-                  className="w-16 h-16 rounded-full object-contain"
+                  className="w-16 h-16 rounded-full object-cover"
                 />
                 <div>
                   <h6 className="text-lg font-bold text-gray-800 mb-1">
                     {blog.author}
                   </h6>
-                  <p className="text-sm text-gray-600 flex items-center">
-                    <svg
-                      fill="#114390"
-                      width="12px"
-                      height="12px"
-                      viewBox="0 0 32 32"
-                      className="mr-1"
-                    >
-                      <path d="M0 26.016q0 2.496 1.76 4.224t4.256 1.76h20q2.464 0 4.224-1.76t1.76-4.224v-20q0-1.952-1.12-3.488t-2.88-2.144v2.624q0 1.248-0.864 2.144t-2.144 0.864-2.112-0.864-0.864-2.144v-3.008h-12v3.008q0 1.248-0.896 2.144t-2.112 0.864-2.144-0.864-0.864-2.144v-2.624q-1.76 0.64-2.88 2.144t-1.12 3.488v20zM4 26.016v-16h24v16q0 0.832-0.576 1.408t-1.408 0.576h-20q-0.832 0-1.44-0.576t-0.576-1.408zM6.016 3.008q0 0.416 0.288 0.704t0.704 0.288 0.704-0.288 0.288-0.704v-3.008h-1.984v3.008zM8 24h4v-4h-4v4zM8 18.016h4v-4h-4v4zM14.016 24h4v-4h-4v4zM14.016 18.016h4v-4h-4v4zM20 24h4v-4h-4v4zM20 18.016h4v-4h-4v4zM24 3.008q0 0.416 0.288 0.704t0.704 0.288 0.704-0.288 0.32-0.704v-3.008h-2.016v3.008z"></path>
-                    </svg>
+                  <p className="text-sm text-gray-600">
                     Published on: {blog.date} | Updated on: {blog.updatedAt}
                   </p>
                 </div>
@@ -185,7 +165,7 @@ const BlogDetails = () => {
               ></div>
 
               {/* Disclaimer Section */}
-              <div className="mt-8">
+              <div className="mt-8 p-6 bg-gray-100 rounded-lg">
                 <h3 className="text-xl font-bold text-blue-600 mb-4">
                   DISCLAIMER
                 </h3>
@@ -279,7 +259,7 @@ const BlogDetails = () => {
                     comments.map((comment, index) => (
                       <div
                         key={index}
-                        className="bg-gray-50 p-6 rounded-lg shadow-sm"
+                        className="bg-white p-6 rounded-lg shadow-sm"
                       >
                         <div className="flex items-center space-x-4">
                           <div className="flex-shrink-0">
@@ -312,7 +292,7 @@ const BlogDetails = () => {
           {/* Right Side - Our Solutions and Related Articles */}
           <div className="lg:col-span-1">
             {/* Our Solutions Section */}
-            <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+            <div className="bg-white rounded-lg shadow-xl p-6 mb-8">
               <h5 className="text-xl font-bold text-gray-800 mb-4">
                 Our Solutions
               </h5>
@@ -331,7 +311,7 @@ const BlogDetails = () => {
             </div>
 
             {/* Related Articles Section */}
-            <div className="bg-white shadow-lg rounded-lg p-6">
+            <div className="bg-white rounded-lg shadow-xl p-6">
               <h5 className="text-xl font-bold text-gray-800 mb-4">
                 Related Blogs
               </h5>
