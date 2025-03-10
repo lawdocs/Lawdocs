@@ -15,10 +15,11 @@ import App1 from "../../Frontend/Admin/src/App1";
 import AddBlog from "./Pages/Blogs/AddBlog";
 import ScrollToTop from "./ScrollToTop.jsx";
 
+import  DemoPage from "./Pages/Demo/DemoPage";
 
-function ProtectedRoute({ children }) {
-  const { isSignedIn } = useUser();
-  return isSignedIn ? children : <RedirectToSignIn />;
+function ProtectedRoute({children}){
+  const {isSignedIn} =useUser();
+  return isSignedIn ? children :<RedirectToSignIn/>
 }
 
 function App() {
@@ -61,7 +62,9 @@ function App() {
               <Route path="/blogs" element={<Blogs />} />
               <Route path="/blogs-Details/:id" element={<BlogsDetails />} />
               <Route path="/team" element={<Team />} />
-              <Route path="/team-details" element={<TeamDetails />} />
+              <Route path="/team-details" element={<TeamDetails/>} />
+              <Route path="/demo-page" element={<DemoPage/>} />
+              
               <Route
                 path="/about"
                 element={
