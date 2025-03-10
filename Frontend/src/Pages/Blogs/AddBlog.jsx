@@ -13,12 +13,16 @@ const AddBlog = () => {
     category: "",
     name: "",
     author: "",
-    image: null,
+    blogImage: null,
+    authorImage: null,
+    coAuthorImage: null,
     description: "",
     date: moment().format("YYYY-MM-DD"),
   });
 
   const [errors, setErrors] = useState({});
+  const [existingAuthorImage, setExistingAuthorImage] = useState(null); // Store existing image URL
+  const [useExistingImage, setUseExistingImage] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userId } = useAuth();
   const navigate = useNavigate(); // Initialize navigate
@@ -28,11 +32,12 @@ const AddBlog = () => {
     if (!blogData.category.trim()) tempErrors.category = "Category is required";
     if (!blogData.name.trim()) tempErrors.name = "Blog Name is required";
     if (!blogData.author.trim()) tempErrors.author = "Author Name is required";
-    if (!blogData.image) tempErrors.image = "Image is required";
+    if (!blogData.blogImage) tempErrors.blogImage = " Blog Image is required";
+    if (!blogData.authorImage)
+      tempErrors.authorImage = "Author  Image is required";
     if (!blogData.description.trim())
       tempErrors.description = "Description is required";
     if (!blogData.date) tempErrors.date = "Date is required";
-
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
   };
@@ -43,9 +48,19 @@ const AddBlog = () => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const handleImageChange = (e) => {
-    setBlogData({ ...blogData, image: e.target.files[0] });
-    setErrors({ ...errors, image: "" });
+  const handleBlogImageChange = (e) => {
+    setBlogData({ ...blogData, blogImage: e.target.files[0] });
+    setErrors({ ...errors, blogImage: "" });
+  };
+
+  const handleAuthorImageChange = (e) => {
+    console.log("image", e.target);
+    setBlogData({ ...blogData, authorImage: e.target.files[0] });
+    setErrors({ ...errors, authorImage: "" });
+  };
+
+  const handleCOAuthorImageChange = (e) => {
+    setBlogData({ ...blogData, coAuthorImage: e.target.files[0] });
   };
 
   const handleEditorChange = (value) => {
@@ -86,13 +101,15 @@ const AddBlog = () => {
       // Navigate to /blogs after 2 seconds to show the toast
       setTimeout(() => {
         navigate("/blogs");
-      }, 2000);
+      }, 1000);
 
       setBlogData({
         category: "",
         name: "",
         author: "",
-        image: null,
+        blogImage: null,
+        authorImage: null,
+        coAuthorImage: null,
         description: "",
         date: moment().format("YYYY-MM-DD"),
       });
@@ -136,17 +153,42 @@ const AddBlog = () => {
         ))}
         <div>
           <label className="block font-medium text-gray-700">
-            Add an Image
+            Add a Blog Image
           </label>
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={handleBlogImageChange}
             className="w-full border p-2 rounded-lg cursor-pointer"
           />
           {errors.image && (
-            <p className="text-red-500 text-sm">{errors.image}</p>
+            <p className="text-red-500 text-sm">{errors.blogImage}</p>
           )}
+        </div>
+        <div>
+          <label className="block font-medium text-gray-700">
+            Add Author Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleAuthorImageChange}
+            className="w-full border p-2 rounded-lg cursor-pointer"
+          />
+          {errors.image && (
+            <p className="text-red-500 text-sm">{errors.authorImage}</p>
+          )}
+        </div>
+        <div>
+          <label className="block font-medium text-gray-700">
+            Add co-Author Image (optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleCOAuthorImageChange}
+            className="w-full border p-2 rounded-lg cursor-pointer"
+          />
         </div>
         <div>
           <label className="block font-medium text-gray-700">

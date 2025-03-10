@@ -8,6 +8,7 @@ export default defineConfig({
     //   '/api':`${import.meta.env.VITE_API_BASE_URL}`
     // },
   },
+  
   plugins: [react()],
   resolve: {
     alias: {

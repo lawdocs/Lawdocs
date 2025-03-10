@@ -1,10 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
-  SignedIn,
   RedirectToSignIn,
   useUser,
-  useClerk,
 } from "@clerk/clerk-react";
 import Home from "./Pages/Home";
 import About from "./Pages/About";

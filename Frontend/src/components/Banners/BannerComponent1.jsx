@@ -41,7 +41,7 @@ function BannerComponent1() {
     <Card
       style={{
         backgroundImage:
-          "linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('public/assets/Banner/Banner8.webp')",
+          "linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/Banner/Banner8.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",

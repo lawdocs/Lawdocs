@@ -30,7 +30,7 @@
     return (
       <div
         style={{
-          backgroundImage: 'url("public/assets/Banner/Banner10.webp")',
+          backgroundImage: 'url("assets/Banner/Banner10.webp")',
           backgroundSize: "cover",
           backgroundPosition: "top",
           backgroundRepeat: "no-repeat",

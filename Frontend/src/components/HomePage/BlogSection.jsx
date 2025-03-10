@@ -14,19 +14,19 @@ function BlogSection() {
               title:
                 "Intellectual Property Rights Made Easy: A Guide for Small Businesses",
               description: "A guide for small businesses.",
-              image: "src/assets/Blogs/Blog6.webp",
+              image: "public/assets/Blogs/Blog6.webp",
             },
             {
               title:
                 "Why Every Business Needs a Business Partnership Agreement: Key Benefits and Legal Protection",
               description: "Key benefits and legal protection.",
-              image: "src/assets/Blogs/Blog8.webp",
+              image: "public/assets/Blogs/Blog8.webp",
             },
             {
               title:
                 "Non-Disclosure Agreements: Protecting Confidentiality and Minimizing Legal Risks",
               description: "Protecting confidentiality.",
-              image: "src/assets/Blogs/Blog9.webp",
+              image: "assets/Blogs/Blog9.webp",
             },
           ].map((blog, index) => (
             <Card
