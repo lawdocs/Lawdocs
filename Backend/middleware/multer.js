@@ -24,6 +24,10 @@ const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-});
+}).fields([
+  { name: "blogImage", maxCount: 1 },
+  { name: "authorImage", maxCount: 1 },
+  { name: "coAuthorImage", maxCount: 1 },
+]);
 
 export default upload;

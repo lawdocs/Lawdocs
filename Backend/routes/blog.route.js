@@ -19,7 +19,7 @@ import upload from '../middleware/multer.js'
 // import { requireAuth } from "../middleware/authMiddleware.js"
 const router=express.Router()
 
-router.post('/createblog',upload.single('image'),CreateBlog)
+router.post('/createblog',upload,CreateBlog)
 router.get("/getBlogs", getPendingBlogs);
 router.get('/getBlog/:id',getBlog)
 router.put('/update/:id',updateBlog)

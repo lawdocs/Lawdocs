@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const commentSchema = new mongoose.Schema(
   {
     name: {
@@ -22,8 +23,11 @@ const BlogSchema = new mongoose.Schema(
   {
     category: { type: String, required: true },
     name: { type: String, required: true },
-    author: { type: String, required: true },
-    image: { type: String, required: true }, // Cloudinary URL
+    authorName: { type: String, required: true },
+    coAuthorName: { type: String },
+    blogImage: { type: String, required: true }, // Cloudinary URL for blog image
+    authorImage: { type: String, required: true }, // Cloudinary URL for author image
+    coAuthorImage: { type: String }, // Optional Cloudinary URL for co-author image
     description: { type: String, required: true },
     status: { type: String, enum: ["pending", "approved"], default: "pending" }, // Approval status
     createdBy: {
@@ -31,8 +35,8 @@ const BlogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    comments:[commentSchema],
-    date: { type: String, required: true }, // Reference to the User
+    comments: [commentSchema],
+    date: { type: String, required: true },
   },
   { timestamps: true }
 );

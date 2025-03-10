@@ -1,21 +1,13 @@
-// import { v2 as cloudinary } from "cloudinary";
-import streamifier from "streamifier"; // Import streamifier
 import Blog from "../model/Blogs/Blog.model.js";
 import User from "../model/user.model.js";
 import cloudinary from "../utils/Cloudinary.js";
+import streamifier from "streamifier";
 
-// cloudinary.config({
-//   cloud_name:process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key:process.env.CLOUDINARY_API_KEY,
-//   api_secret:process.env.CLOUDINARY_API_SECRET,
-// });
-
-const uploadToCloudinary = (buffer) => {
-
-
+// Helper function to upload files to Cloudinary
+const uploadToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "blogs" }, // Cloudinary folder (optional)
+      { folder }, // Cloudinary folder (optional)
       (error, result) => {
         if (error) reject(error);
         else resolve(result);
@@ -25,43 +17,75 @@ const uploadToCloudinary = (buffer) => {
   });
 };
 
+// Create a new blog
 export const CreateBlog = async (req, res) => {
   try {
-    const { category, name, author, description, createdBy, date } = req.body;
-    console.log("uu", createdBy);
-    console.log("catt", category);
-    // const userId=req.auth.userId
-    const userId = createdBy;
+    const {
+      category,
+      name,
+      authorName,
+      coAuthorName,
+      description,
+      createdBy,
+      date,
+    } = req.body;
 
-    const user = await User.findOne({ clerkId: userId });
+    const user = await User.findOne({ clerkId: createdBy });
     if (!user) {
       return res
         .status(404)
         .json({ error: "User not found. Please register first." });
     }
 
-    if (!req.file) return res.status(400).json({ error: "Image is required" });
+    if (!req.files || !req.files.blogImage || !req.files.authorImage) {
+      return res
+        .status(400)
+        .json({ error: "Blog and Author images are required" });
+    }
 
-    const result = await uploadToCloudinary(req.file.buffer);
+    // Upload images to Cloudinary
+    const blogImageResult = await uploadToCloudinary(
+      req.files.blogImage[0].buffer,
+      "blogs"
+    );
+    const authorImageResult = await uploadToCloudinary(
+      req.files.authorImage[0].buffer,
+      "authors"
+    );
+
+    let coAuthorImageResult = null;
+    if (req.files.coAuthorImage) {
+      coAuthorImageResult = await uploadToCloudinary(
+        req.files.coAuthorImage[0].buffer,
+        "authors"
+      );
+    }
 
     const blog = new Blog({
       category,
       name,
-      author,
+      authorName,
+      coAuthorName,
       description,
-      image: result.secure_url,
-      createdBy: user._id, // Store the user's ObjectId
+      blogImage: blogImageResult.secure_url,
+      authorImage: authorImageResult.secure_url,
+      coAuthorImage: coAuthorImageResult
+        ? coAuthorImageResult.secure_url
+        : null,
+      createdBy: user._id,
       date,
-      status: "pending", // Set status as pending for admin approval
+      status: "pending",
     });
 
     await blog.save();
     res.status(201).json({ message: "Blog submitted for approval!", blog });
   } catch (err) {
-    console.log("errro ", err);
+    console.log("error ", err);
+    res.status(500).json({ message: "Error creating blog", error: err });
   }
 };
 
+// Get pending blogs
 export const getPendingBlogs = async (req, res) => {
   try {
     const pendingBlogs = await Blog.find({ status: "pending" });
@@ -72,6 +96,8 @@ export const getPendingBlogs = async (req, res) => {
     res.status(500).json({ message: "Error fetching pending blogs", error });
   }
 };
+
+// Get approved blogs
 export const getApprovedBlogs = async (req, res) => {
   try {
     const approvedBlogs = await Blog.find({ status: "approved" });
@@ -79,40 +105,43 @@ export const getApprovedBlogs = async (req, res) => {
       .status(200)
       .json({ message: "Approved blogs fetched successfully", approvedBlogs });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching Approved blogs", error });
+    res.status(500).json({ message: "Error fetching approved blogs", error });
   }
 };
+
+// Get all blogs
 export const getAllBlogs = async (req, res) => {
   try {
-    const   Blogs = await Blog.find();
-    res
-      .status(200)
-      .json({ message: "All blogs fetched successfully", Blogs });
+    const blogs = await Blog.find();
+    res.status(200).json({ message: "All blogs fetched successfully", blogs });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching All blogs", error });
+    res.status(500).json({ message: "Error fetching all blogs", error });
   }
 };
+
+// Get a specific blog by ID
 export const getBlog = async (req, res) => {
   try {
-        const { id } = req.params;
-
+    const { id } = req.params;
     const blog = await Blog.findById(id);
     res
       .status(200)
       .json({ message: "Particular blog fetched successfully", blog });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching pending blogs", error });
+    res.status(500).json({ message: "Error fetching blog", error });
   }
 };
 
+// Update a blog
 export const updateBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, author, image } = req.body;
+    const { name, category, authorName, coAuthorName, description, date } =
+      req.body;
 
     const updatedBlog = await Blog.findByIdAndUpdate(
       id,
-      { name, category, author, image },
+      { name, category, authorName, coAuthorName, description, date },
       { new: true }
     );
 
@@ -132,171 +161,157 @@ export const deleteBlog = async (req, res) => {
     const { id } = req.params;
     const blog = await Blog.findById(id);
 
-    // Extract the public ID from the Cloudinary URL
-    const imageUrl = blog.image; // Cloudinary URL
-    const publicId = imageUrl.split("/").pop().split(".")[0]; // Extract public ID
-
-    // Delete the image from Cloudinary
-    await cloudinary.uploader.destroy(`blogs/${publicId}`, (error, result) => {
-      if (error) {
-        console.error("Cloudinary deletion error:", error);
-      } else {
-        console.log("Cloudinary image deleted:", result);
-      }
-    });
-    const deletedBlog = await Blog.findByIdAndDelete(id);
-
-    if (!deletedBlog) {
+    if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Delete images from Cloudinary
+    const deleteImage = async (url, folder) => {
+      const publicId = url.split("/").pop().split(".")[0]; // Extract public ID
+      await cloudinary.uploader.destroy(`${folder}/${publicId}`);
+    };
+
+    if (blog.blogImage) await deleteImage(blog.blogImage, "blogs");
+    if (blog.authorImage) await deleteImage(blog.authorImage, "authors");
+    if (blog.coAuthorImage) await deleteImage(blog.coAuthorImage, "authors");
+
+    await Blog.findByIdAndDelete(id);
     res.status(200).json({ message: "Blog deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting blog", error });
   }
 };
 
-export const updateBlogStatus=async (req,res)=>{
-      const { status } = req.body;
-
-  
-
+// Update blog status
+export const updateBlogStatus = async (req, res) => {
   try {
-     const { id } = req.params;
-     console.log("id",id);
-     const updatedBlog = await Blog.findByIdAndUpdate(
-       id,
-       { status },
-       { new: true }
-     );
-     console.log("updated",updateBlog);
+    const { id } = req.params;
+    const { status } = req.body;
 
-     if (!updatedBlog) {
-       return res.status(404).json({ message: "Blog not found" });
-     }
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
 
-     res
-       .status(200)
-       .json({ message: "Blog updated successfully", updatedBlog });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating blog", error });
-  }
-     
-
-  
-}
-
-export const addComments=async(req,res)=>{
-  try {
-    const {email,name,comment}=req.body;
-
-    const blog=await Blog.findById(req.params.id)
-    console.log("blog",blog);
-    if(!blog){
+    if (!updatedBlog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    const newcomment={
-      name,
-      email,
-      comment,
-      status:"pending"
-    }
-
-    blog.comments.push(newcomment)
-    console.log("blog comments",blog);
-    await blog.save()
-    console.log("blog",blog);
-
-    res.status(201).json({message:"Comment added Succesful .pending approval"})
-
+    res
+      .status(200)
+      .json({ message: "Blog status updated successfully", updatedBlog });
   } catch (error) {
-    res.status(500).json({ message: "Error adding comments", error });
+    res.status(500).json({ message: "Error updating blog status", error });
   }
+};
 
-}
-
-export const getApprovedComments=async(req,res)=>{
-  
-   try {
+// Add a comment to a blog
+export const addComments = async (req, res) => {
+  try {
+    const { email, name, comment } = req.body;
     const blog = await Blog.findById(req.params.id);
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    const approvedComments = blog.comments.filter(comment => comment.status === "approved");
-    res.json(approvedComments);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
+    const newComment = {
+      name,
+      email,
+      comment,
+      status: "pending",
+    };
 
-}
-export const getAllComments=async(req,res)=>{
-  
-   try {
-    const {status}=req.query
-    const blog = await Blog.findById(req.params.id).select('comments');
+    blog.comments.push(newComment);
+    await blog.save();
+
+    res
+      .status(201)
+      .json({ message: "Comment added successfully. Pending approval." });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding comment", error });
+  }
+};
+
+// Get approved comments for a blog
+export const getApprovedComments = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const approvedComments = blog.comments.filter(
+      (comment) => comment.status === "approved"
+    );
+    res.status(200).json(approvedComments);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching approved comments", error });
+  }
+};
+
+// Get all comments for a blog (filtered by status if provided)
+export const getAllComments = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const blog = await Blog.findById(req.params.id).select("comments");
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
     let comments = blog.comments;
-    if(status){
-      comments=comments.filter((comment)=>comment.status==status)
+    if (status) {
+      comments = comments.filter((comment) => comment.status === status);
     }
-    res.json(comments);
+
+    res.status(200).json(comments);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Error fetching comments", error });
   }
+};
 
-}
-
+// Update a comment
 export const updateComment = async (req, res) => {
   try {
-    const { blogId,commentId } = req.params;
-    const { name, email,comment } = req.body;
-    console.log("name",name);
-    console.log("email",email);
-    console.log("comment",comment);
-    console.log("blogId",blogId);
-    console.log("commentId",commentId);
+    const { blogId, commentId } = req.params;
+    const { name, email, comment } = req.body;
 
-    const updatedComment = await Blog.findOneAndUpdate(
-      {_id:blogId,"comments._id":commentId},
-      
-
+    const updatedBlog = await Blog.findOneAndUpdate(
+      { _id: blogId, "comments._id": commentId },
       {
         $set: {
           "comments.$.name": name,
           "comments.$.email": email,
           "comments.$.comment": comment,
-        }
+        },
       },
       { new: true }
     );
-if (!blogId || !commentId) {
-  return res
-    .status(400)
-    .json({ message: "Blog ID and Comment ID are required" });
-}
-    if (!updatedComment) {
+
+    if (!updatedBlog) {
       return res.status(404).json({ message: "Blog or Comment not found" });
     }
 
-    res.status(200).json({ message: "Comment updated successfully", updatedComment });
+    res
+      .status(200)
+      .json({ message: "Comment updated successfully", updatedBlog });
   } catch (error) {
-    res.status(500).json({ message: "Error updating Comment", error });
+    res.status(500).json({ message: "Error updating comment", error });
   }
 };
+
+// Approve a comment
 export const approveComment = async (req, res) => {
   try {
-    const { blogId,commentId } = req.params;
+    const { blogId, commentId } = req.params;
 
-    const updatedComment = await Blog.findOneAndUpdate(
+    const updatedBlog = await Blog.findOneAndUpdate(
       { _id: blogId, "comments._id": commentId },
-
       {
         $set: {
           "comments.$.status": "approved",
@@ -304,34 +319,27 @@ export const approveComment = async (req, res) => {
       },
       { new: true }
     );
-if (!blogId || !commentId) {
-  return res
-    .status(400)
-    .json({ message: "Blog ID and Comment ID are required" });
-}
-    if (!updatedComment) {
+
+    if (!updatedBlog) {
       return res.status(404).json({ message: "Blog or Comment not found" });
     }
 
-    res.status(200).json({ message: "Comment updated successfully", updatedComment });
+    res
+      .status(200)
+      .json({ message: "Comment approved successfully", updatedBlog });
   } catch (error) {
-    res.status(500).json({ message: "Error updating Comment", error });
+    res.status(500).json({ message: "Error approving comment", error });
   }
 };
 
+// Delete a comment
 export const deleteComment = async (req, res) => {
   try {
     const { blogId, commentId } = req.params;
 
-    if (!blogId || !commentId) {
-      return res
-        .status(400)
-        .json({ message: "Blog ID and Comment ID are required" });
-    }
-
     const updatedBlog = await Blog.findByIdAndUpdate(
       blogId,
-      { $pull: { comments: { _id: commentId } } }, // Remove the comment from the array
+      { $pull: { comments: { _id: commentId } } },
       { new: true }
     );
 
@@ -344,4 +352,3 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ message: "Error deleting comment", error });
   }
 };
-
