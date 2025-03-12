@@ -14,7 +14,11 @@ const BlogDetails = () => {
     email: "",
     comment: "",
   });
-  const [comments, setComments] = useState([]); // State to store previous comments
+  const [comments, setComments] = useState([]);
+  
+  
+  
+  // State to store previous comments
 
   // Fetch blog data from the API
   useEffect(() => {
@@ -23,6 +27,7 @@ const BlogDetails = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/getBlog/${id}`
         );
+        console.log("ress",response.data.blog);
         setBlog(response.data.blog);
       } catch (err) {
         setError(err.message);
@@ -144,21 +149,44 @@ const BlogDetails = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-xl p-8">
               {/* Author Section */}
-              <div className="flex items-center space-x-4 mb-6">
-                <img
-                  src={blog.image}
-                  alt={blog.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <h6 className="text-lg font-bold text-gray-800 mb-1">
-                    {blog.author}
-                  </h6>
-                  <p className="text-sm text-gray-600">
-                    Published on: {blog.date} | Updated on: {blog.updatedAt}
-                  </p>
+
+              <div className="flex gap-[3vw]">
+                <div className="flex items-center space-x-4 mb-6">
+                  <img
+                    src={blog.authorImage}
+                    alt={blog.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div>
+                    <h6 className="text-lg font-bold text-gray-800 mb-1">
+                      {blog.coAuthorName}
+                    </h6>
+                    <p className="text-sm text-gray-600">
+                      Published on: {blog.date}
+                      {/* | Updated on: {new Date(blog.updatedAt).toLocaleDateString( )} */}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-4 mb-6">
+                  <img
+                    src={blog.authorImage}
+                    alt={blog.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <div>
+                    <h6 className="text-lg font-bold text-gray-800 mb-1">
+                      {blog.authorName}
+                    </h6>
+                    <p className="text-sm text-gray-600">
+                      Updated on:{" "}
+                      {new Date(blog.updatedAt).toLocaleDateString()}
+                      {/* |  */}
+                    </p>
+                  </div>
                 </div>
               </div>
+
+              <div></div>
 
               {/* Blog Content */}
               <div

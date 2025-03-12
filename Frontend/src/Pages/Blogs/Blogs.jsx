@@ -12,7 +12,11 @@ function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 6;
+
+
+
 const navigate=useNavigate()
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -115,7 +119,7 @@ const navigate=useNavigate()
               className="rounded-lg shadow-lg bg-white overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <img
-                src={blog.image}
+                src={blog.blogImage}
                 alt={blog.name}
                 className="w-full h-48 object-contain"
               />
@@ -124,7 +128,7 @@ const navigate=useNavigate()
                 <h2 className="mt-2 text-lg font-semibold text-gray-900">
                   {blog.name}
                 </h2>
-                <p className="mt-1 text-gray-700">By {blog.author}</p>
+                <p className="mt-1 text-gray-700">By {blog.authorName}</p>
                 <button onClick={()=>handleblog(blog._id)} className="mt-4 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-all duration-300">
                   Read More →
                 </button>

@@ -131,6 +131,15 @@ const Sidebar = () => {
                       Blog List
                     </Link>
                   </li>
+                  <li>
+                    <Link
+                      to="/blog-categories"
+                      className="block p-2 rounded hover:bg-gray-700 transition-colors duration-200"
+                      onClick={toggleSidebar}
+                    >
+                      Blog Categories
+                    </Link>
+                  </li>
                 </ul>
               )}
             </li>
@@ -174,6 +183,7 @@ const Sidebar = () => {
               <Route path="/addblog" element={<AddBlog />} />
               <Route path="/pending-blogs" element={<PendingBlog />} />
               <Route path="/users" element={<User />} />
+              <Route path="/blog-categories" element={<BlogCategories/>} />
 
               <Route
                 path="/pending-comments/:id"

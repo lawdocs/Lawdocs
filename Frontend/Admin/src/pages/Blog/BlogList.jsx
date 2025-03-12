@@ -18,7 +18,7 @@ const BlogList = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [showFilters, setShowFilters] = useState(false); // For mobile filters
+  const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,7 +27,8 @@ const BlogList = () => {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/getAllBlogs`
         );
-        setBlogs(response.data.Blogs);
+        console.log("fetch", response);
+        setBlogs(response.data.blogs);
       } catch (error) {
         console.error("Error fetching blogs:", error);
       }
@@ -42,7 +43,7 @@ const BlogList = () => {
 
   const handleDelete = async () => {
     try {
-      console.log("Deleting blog with ID:", deleteId); // Debugging
+      console.log("Deleting blog with ID:", deleteId);
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}/blogs/delete/${deleteId}`
       );
@@ -141,10 +142,19 @@ const BlogList = () => {
                 Author
               </th>
               <th className="py-3 px-4 text-left hidden lg:table-cell">
+                Co-Author
+              </th>
+              <th className="py-3 px-4 text-left hidden lg:table-cell">
                 Created
               </th>
               <th className="py-3 px-4 text-left hidden lg:table-cell">
-                Image
+                Blog Image
+              </th>
+              <th className="py-3 px-4 text-left hidden lg:table-cell">
+                Author Image
+              </th>
+              <th className="py-3 px-4 text-left hidden lg:table-cell">
+                Co-Author Image
               </th>
               <th className="py-3 px-4 text-left hidden lg:table-cell">
                 Description
@@ -166,27 +176,56 @@ const BlogList = () => {
                 >
                   <td className="py-3 px-4">{blog.name}</td>
                   <td className="py-3 px-4 hidden lg:table-cell">
-                    {blog.category}
+                    {blog.category || "N/A"}
                   </td>
                   <td className="py-3 px-4 hidden lg:table-cell">
-                    {blog.author}
+                    {blog.authorName || "N/A"}
                   </td>
                   <td className="py-3 px-4 hidden lg:table-cell">
-                    {blog.date}
+                    {blog.coAuthorName || "N/A"}
                   </td>
                   <td className="py-3 px-4 hidden lg:table-cell">
-                    <img
-                      src={blog.image}
-                      alt="blog"
-                      className="w-10 h-10 rounded-lg object-cover"
-                    />
+                    {new Date(blog.date).toLocaleDateString() || "N/A"}
+                  </td>
+                  <td className="py-3 px-4 hidden lg:table-cell">
+                    {blog.blogImage ? (
+                      <img
+                        src={blog.blogImage}
+                        alt="blog"
+                        className="w-10 h-10 rounded-lg object-cover"
+                      />
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td className="py-3 px-4 hidden lg:table-cell">
+                    {blog.authorImage ? (
+                      <img
+                        src={blog.authorImage}
+                        alt="author"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td className="py-3 px-4 hidden lg:table-cell">
+                    {blog.coAuthorImage ? (
+                      <img
+                        src={blog.coAuthorImage}
+                        alt="co-author"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      "N/A"
+                    )}
                   </td>
                   <td className="py-3 px-4 hidden lg:table-cell">
                     <p
                       dangerouslySetInnerHTML={{
                         __html: `${blog.description.substring(0, 50)}...`,
                       }}
-                    ></p>
+                    />
                   </td>
                   <td className="py-3 px-4">
                     <span

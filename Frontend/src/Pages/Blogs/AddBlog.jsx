@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import ReactQuill from "react-quill";
@@ -6,13 +6,15 @@ import "react-quill/dist/quill.snow.css";
 import moment from "moment";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const AddBlog = () => {
+  const [categories, setCategories] = useState([]);
   const [blogData, setBlogData] = useState({
     category: "",
     name: "",
-    author: "",
+    authorName: "",
+    coAuthorName: "",
     blogImage: null,
     authorImage: null,
     coAuthorImage: null,
@@ -21,20 +23,33 @@ const AddBlog = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [existingAuthorImage, setExistingAuthorImage] = useState(null); // Store existing image URL
-  const [useExistingImage, setUseExistingImage] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { userId } = useAuth();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/blogCategory/all`
+        );
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const validateForm = () => {
     let tempErrors = {};
     if (!blogData.category.trim()) tempErrors.category = "Category is required";
     if (!blogData.name.trim()) tempErrors.name = "Blog Name is required";
-    if (!blogData.author.trim()) tempErrors.author = "Author Name is required";
-    if (!blogData.blogImage) tempErrors.blogImage = " Blog Image is required";
+    if (!blogData.authorName.trim())
+      tempErrors.authorName = "Author Name is required";
+    if (!blogData.blogImage) tempErrors.blogImage = "Blog Image is required";
     if (!blogData.authorImage)
-      tempErrors.authorImage = "Author  Image is required";
+      tempErrors.authorImage = "Author Image is required";
     if (!blogData.description.trim())
       tempErrors.description = "Description is required";
     if (!blogData.date) tempErrors.date = "Date is required";
@@ -48,19 +63,10 @@ const AddBlog = () => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const handleBlogImageChange = (e) => {
-    setBlogData({ ...blogData, blogImage: e.target.files[0] });
-    setErrors({ ...errors, blogImage: "" });
-  };
-
-  const handleAuthorImageChange = (e) => {
-    console.log("image", e.target);
-    setBlogData({ ...blogData, authorImage: e.target.files[0] });
-    setErrors({ ...errors, authorImage: "" });
-  };
-
-  const handleCOAuthorImageChange = (e) => {
-    setBlogData({ ...blogData, coAuthorImage: e.target.files[0] });
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setBlogData({ ...blogData, [name]: files[0] });
+    setErrors({ ...errors, [name]: "" });
   };
 
   const handleEditorChange = (value) => {
@@ -80,33 +86,30 @@ const AddBlog = () => {
     setIsSubmitting(true);
     const formData = new FormData();
     Object.keys(blogData).forEach((key) => {
-      formData.append(key, blogData[key]);
+      if (blogData[key]) {
+        formData.append(key, blogData[key]);
+      }
     });
-
     formData.append("createdBy", userId);
 
     try {
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/blogs/createblog`,
         formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       toast.success("Blog request sent for approval!", {
         position: "top-right",
       });
 
-      // Navigate to /blogs after 2 seconds to show the toast
-      setTimeout(() => {
-        navigate("/blogs");
-      }, 1000);
+      setTimeout(() => navigate("/blogs"), 1000);
 
       setBlogData({
         category: "",
         name: "",
-        author: "",
+        authorName: "",
+        coAuthorName: "",
         blogImage: null,
         authorImage: null,
         coAuthorImage: null,
@@ -129,10 +132,39 @@ const AddBlog = () => {
         Add New Blog
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block font-medium text-gray-700">
+            Blog Category
+          </label>
+          <select
+            name="category"
+            value={blogData.category}
+            onChange={handleChange}
+            className={`w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 ${
+              errors.category ? "border-red-500" : ""
+            }`}
+            required
+          >
+            <option value="">Select a category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          {errors.category && (
+            <p className="text-red-500 text-sm">{errors.category}</p>
+          )}
+        </div>
+
         {[
-          { label: "Blog Category", name: "category", type: "text" },
           { label: "Blog Name", name: "name", type: "text" },
-          { label: "Author Name", name: "author", type: "text" },
+          { label: "Author Name", name: "authorName", type: "text" },
+          {
+            label: "Co-Author Name (optional)",
+            name: "coAuthorName",
+            type: "text",
+          },
         ].map(({ label, name, type }) => (
           <div key={name}>
             <label className="block font-medium text-gray-700">{label}</label>
@@ -144,52 +176,33 @@ const AddBlog = () => {
               className={`w-full border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 ${
                 errors[name] ? "border-red-500" : ""
               }`}
-              required
             />
             {errors[name] && (
               <p className="text-red-500 text-sm">{errors[name]}</p>
             )}
           </div>
         ))}
-        <div>
-          <label className="block font-medium text-gray-700">
-            Add a Blog Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleBlogImageChange}
-            className="w-full border p-2 rounded-lg cursor-pointer"
-          />
-          {errors.image && (
-            <p className="text-red-500 text-sm">{errors.blogImage}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700">
-            Add Author Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleAuthorImageChange}
-            className="w-full border p-2 rounded-lg cursor-pointer"
-          />
-          {errors.image && (
-            <p className="text-red-500 text-sm">{errors.authorImage}</p>
-          )}
-        </div>
-        <div>
-          <label className="block font-medium text-gray-700">
-            Add co-Author Image (optional)
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleCOAuthorImageChange}
-            className="w-full border p-2 rounded-lg cursor-pointer"
-          />
-        </div>
+
+        {[
+          { label: "Add a Blog Image", name: "blogImage" },
+          { label: "Add Author Image", name: "authorImage" },
+          { label: "Add Co-Author Image (optional)", name: "coAuthorImage" },
+        ].map(({ label, name }) => (
+          <div key={name}>
+            <label className="block font-medium text-gray-700">{label}</label>
+            <input
+              type="file"
+              accept="image/*"
+              name={name}
+              onChange={handleFileChange}
+              className="w-full border p-2 rounded-lg cursor-pointer"
+            />
+            {errors[name] && (
+              <p className="text-red-500 text-sm">{errors[name]}</p>
+            )}
+          </div>
+        ))}
+
         <div>
           <label className="block font-medium text-gray-700">
             Blog Description
@@ -203,6 +216,7 @@ const AddBlog = () => {
             <p className="text-red-500 text-sm">{errors.description}</p>
           )}
         </div>
+
         <div>
           <label className="block font-medium text-gray-700">Date</label>
           <input
@@ -217,12 +231,11 @@ const AddBlog = () => {
           />
           {errors.date && <p className="text-red-500 text-sm">{errors.date}</p>}
         </div>
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full bg-blue-600 text-white py-3 rounded-lg ${
-            isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-          }`}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
         >
           {isSubmitting ? "Saving..." : "Save Blog"}
         </button>
