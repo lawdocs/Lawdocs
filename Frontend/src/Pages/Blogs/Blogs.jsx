@@ -3,23 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaArrowUp, FaSearch } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function BlogPage() {
-  
   const [blogs, setBlogs] = useState([]);
   const [categories, setCategories] = useState(["All"]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 6;
-const navigate=useNavigate()
+  const blogsPerPage = 8;
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/getApprovedBlogs`
         );
-        console.log("API Response:", res.data); // Debugging API response
         setBlogs(res.data.approvedBlogs);
 
         const uniqueCategories = [
@@ -51,6 +51,7 @@ const navigate=useNavigate()
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleblog = (id) => navigate(`/blogs-Details/${id}`);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 md:px-10 lg:px-16">
       <div className="text-center mb-12">
@@ -104,7 +105,7 @@ const navigate=useNavigate()
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {currentBlogs.map((blog) => (
             <motion.div
@@ -112,22 +113,39 @@ const navigate=useNavigate()
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="rounded-lg shadow-lg bg-white overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
-              <img
-                src={blog.image}
-                alt={blog.name}
-                className="w-full h-48 object-contain"
-              />
-              <div className="p-6">
-                <span className="text-sm text-gray-500">{blog.date}</span>
-                <h2 className="mt-2 text-lg font-semibold text-gray-900">
-                  {blog.name}
-                </h2>
-                <p className="mt-1 text-gray-700">By {blog.author}</p>
-                <button onClick={()=>handleblog(blog._id)} className="mt-4 px-4 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-all duration-300">
-                  Read More →
-                </button>
+              {/* Card Design */}
+              <div className="overflow-hidden rounded-xl shadow-lg bg-white text-left transition-all duration-300 hover:shadow-2xl hover:scale-105">
+                {/* Clickable Image */}
+                <Link to={`/blogs-Details/${blog._id}`}>
+                  <img
+                    src={blog.image}
+                    alt={blog.name}
+                    className="w-full h-64 object-cover cursor-pointer" // Adjusted image height for better visibility
+                  />
+                </Link>
+                <div className="p-6">
+                  {/* Clickable Title */}
+                  <Link to={`/blogs-Details/${blog._id}`}>
+                    <h3 className="text-xl font-semibold mb-4 text-gray-900 line-clamp-2 cursor-pointer hover:text-blue-600">
+                      {blog.name}
+                    </h3>
+                  </Link>
+
+                  {/* Blog Date and Author */}
+                  <div className="text-sm text-gray-500 mb-4 flex items-center space-x-2">
+                    <p className="text-gray-700 font-medium">By {blog.author}</p>
+                    <span className="text-gray-400">•</span>
+                    <p>{new Date(blog.date).toLocaleDateString()}</p>
+                  </div>
+
+                  <Link
+                    to={`/blogs-Details/${blog._id}`}
+                    className="text-[#1E3A8A] p-0 font-semibold"
+                  >
+                    Read More →
+                  </Link>
+                </div>
               </div>
             </motion.div>
           ))}

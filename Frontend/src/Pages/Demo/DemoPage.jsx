@@ -29,7 +29,7 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Attractive Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 py-20 text-center text-white">
+      <div className="bg-gradient-to-r bg-black  py-20 text-center text-amber-500">
         <h1 className="text-5xl font-bold mb-4">Help & Support</h1>
         <p className="text-lg">We're here to help you with any issues or questions. Reach out to us anytime!</p>
       </div>
@@ -57,7 +57,10 @@ const DemoPage = () => {
       <div className="bg-[#e4e4e4] py-12">
         <div className="w-full px-4">
           <div className="bg-white p-8 rounded-lg shadow-md w-full">
-            <h2 className="text-2xl font-bold text-blue-600 mb-6">Contact Us</h2>
+          <h2 className="text-4xl font-bold text-blue-600 mb-10 text-center">
+  Raise your query
+</h2>
+
             <form className="space-y-6">
               {/* Name, Mobile No., and Email in One Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
