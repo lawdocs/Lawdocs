@@ -36,6 +36,8 @@ const BlogSchema = new mongoose.Schema(
       required: true,
     },
     comments: [commentSchema],
+    isTrending: { type: Boolean,  default:false},
+
     date: { type: String, required: true },
   },
   { timestamps: true }

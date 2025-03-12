@@ -22,19 +22,20 @@ const BlogList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/blogs/getAllBlogs`
-        );
-        console.log("fetch", response);
-        setBlogs(response.data.blogs);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-      }
-    };
+   
     fetchBlogs();
   }, []);
+   const fetchBlogs = async () => {
+     try {
+       const response = await axios.get(
+         `${import.meta.env.VITE_API_BASE_URL}/blogs/getAllBlogs`
+       );
+       console.log("fetch", response);
+       setBlogs(response.data.blogs);
+     } catch (error) {
+       console.error("Error fetching blogs:", error);
+     }
+   };
 
   const confirmDelete = (id) => {
     setDeleteId(id);
@@ -65,6 +66,22 @@ const BlogList = () => {
   const pendingBlogsCount = blogs.filter(
     (blog) => blog.status === "pending"
   ).length;
+
+ const handleToggleTrending = async (blogId) => {
+   try {
+    console.log("blogid",blogId);
+     const response = await axios.patch(
+       `${import.meta.env.VITE_API_BASE_URL}/blogs/toggleTrending/${blogId}`
+     );
+     fetchBlogs()
+     // Update state to reflect the new trending status
+    
+     console.log("Trending status updated:", response.data);
+   } catch (error) {
+     console.error("Error updating trending status:", error);
+   }
+ };
+
 
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
@@ -260,11 +277,22 @@ const BlogList = () => {
                       <FaTrash />
                     </button>
                     <button
+                      onClick={()=>handleToggleTrending(blog._id)}
+                      className={`px-4 py-2 rounded text-white ${
+                        blog.isTrending ? "bg-red-500" : "bg-blue-500"
+                      }`}
+                    >
+                      {blog.isTrending
+                        ? "Remove from Trending"
+                        : "Mark as Trending"}
+                    </button>
+
+                    {/* <button
                       className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1"
                       onClick={() => navigate(`/blog/${blog._id}/description`)}
                     >
                       <FaEye /> See
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}

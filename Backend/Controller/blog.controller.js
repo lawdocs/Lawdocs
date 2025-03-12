@@ -17,6 +17,11 @@ const uploadToCloudinary = (buffer, folder) => {
   });
 };
 
+const deleteImage = async (url, folder) => {
+  const publicId = url.split("/").pop().split(".")[0]; // Extract public ID
+  await cloudinary.uploader.destroy(`${folder}/${publicId}`);
+};
+
 // Create a new blog
 export const CreateBlog = async (req, res) => {
   try {
@@ -132,29 +137,82 @@ export const getBlog = async (req, res) => {
   }
 };
 
-// Update a blog
+
+
+// Update blog
 export const updateBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, authorName, coAuthorName, description, date } =
-      req.body;
+    const {
+      name,
+      category,
+      authorName,
+      coAuthorName,
+      description,
+      date,
+      status,
+    } = req.body;
 
-    const updatedBlog = await Blog.findByIdAndUpdate(
-      id,
-      { name, category, authorName, coAuthorName, description, date },
-      { new: true }
-    );
-
-    if (!updatedBlog) {
+    // Find the existing blog
+    const existingBlog = await Blog.findById(id);
+    if (!existingBlog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Delete old images if new images are provided
+    if (req.files?.blogImage) {
+      if (existingBlog.blogImage) {
+        await deleteImage(existingBlog.blogImage, "blogs");
+      }
+      const blogImageResult = await uploadToCloudinary(
+        req.files.blogImage[0].buffer,
+        "blogs"
+      );
+      existingBlog.blogImage = blogImageResult.secure_url;
+    }
+
+    if (req.files?.authorImage) {
+      if (existingBlog.authorImage) {
+        await deleteImage(existingBlog.authorImage, "authors");
+      }
+      const authorImageResult = await uploadToCloudinary(
+        req.files.authorImage[0].buffer,
+        "authors"
+      );
+      existingBlog.authorImage = authorImageResult.secure_url;
+    }
+
+    if (req.files?.coAuthorImage) {
+      if (existingBlog.coAuthorImage) {
+        await deleteImage(existingBlog.coAuthorImage, "authors");
+      }
+      console.log("ee",existingBlog.coAuthorImage)
+      const coAuthorImageResult = await uploadToCloudinary(
+        req.files.coAuthorImage[0].buffer,
+        "authors"
+      );
+      console.log("coauth",existingBlog);
+      existingBlog.coAuthorImage = coAuthorImageResult.secure_url;
+    }
+
+    // Update other fields
+    existingBlog.name = name;
+    existingBlog.category = category;
+    existingBlog.authorName = authorName;
+    existingBlog.coAuthorName = coAuthorName;
+    existingBlog.description = description;
+    existingBlog.date = date;
+    existingBlog.status = status;
+
+    // Save the updated blog
+    const updatedBlog = await existingBlog.save();
+
     res.status(200).json({ message: "Blog updated successfully", updatedBlog });
   } catch (error) {
+    console.error("Error updating blog:", error);
     res.status(500).json({ message: "Error updating blog", error });
   }
 };
-
 // Delete a blog
 export const deleteBlog = async (req, res) => {
   try {
@@ -302,6 +360,52 @@ export const updateComment = async (req, res) => {
       .json({ message: "Comment updated successfully", updatedBlog });
   } catch (error) {
     res.status(500).json({ message: "Error updating comment", error });
+  }
+};
+
+export const getTrendingBlogs=async(req,res)=>{
+  try{
+    // const {id}=request.params
+    const blogs=await Blog.find({isTrending:true})
+    res.status(200).json({ message: "trending Blogs",blogs})
+
+  }catch(err){
+        res.status(500).json({ message: "Server error", err });
+
+  }
+
+}
+export const toggleTrending = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const blog = await Blog.findById(id);
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+
+    const trendingBlogs = await Blog.find({ isTrending: true }).sort({
+      updatedAt: 1,
+    });
+
+    // If marking as trending
+    if (!blog.isTrending) {
+      // Check if there are already 3 trending blogs
+      if (trendingBlogs.length >= 3) {
+        // Remove the oldest trending blog
+        const oldestTrending = trendingBlogs[0];
+        oldestTrending.isTrending = false;
+        await oldestTrending.save();
+      }
+      blog.isTrending = true;
+    }
+    // If removing from trending
+    else {
+      // Allow removing from trending regardless of the number of trending blogs
+      blog.isTrending = false;
+    }
+
+    await blog.save();
+    res.json({ message: "Trending status updated", blog });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };
 

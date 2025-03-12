@@ -44,9 +44,9 @@ function App() {
   }
 
   // Render the admin panel if the user is an admin
-  // if (isAdmin) {
-  //   return <App1 />;
-  // }
+  if (isAdmin) {
+    return <App1 />;
+  }
 
   // Render the normal UI for non-admin users
   return (

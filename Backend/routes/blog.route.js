@@ -14,15 +14,22 @@ import {
   deleteComment,
   getAllComments,
   approveComment,
+  toggleTrending,
+  getTrendingBlogs,
 } from "../Controller/blog.controller.js";
 import upload from '../middleware/multer.js'
+// import multer from "multer";
 // import { requireAuth } from "../middleware/authMiddleware.js"
 const router=express.Router()
+// const upload = multer();
+
 
 router.post('/createblog',upload,CreateBlog)
+router.get('/trending',getTrendingBlogs)
+router.patch("/toggleTrending/:id", toggleTrending);
 router.get("/getBlogs", getPendingBlogs);
 router.get('/getBlog/:id',getBlog)
-router.put('/update/:id',updateBlog)
+router.put('/update/:id',upload,updateBlog)
 router.delete('/delete/:id',deleteBlog) 
 router.put("/updateStatus/:id",updateBlogStatus);
 router.get('/getAllBlogs',getAllBlogs)

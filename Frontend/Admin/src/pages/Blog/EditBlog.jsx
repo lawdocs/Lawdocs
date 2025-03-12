@@ -2,9 +2,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify"; // For toast notifications
+import "react-toastify/dist/ReactToastify.css"; 
 
 const EditBlog = () => {
-  const { id } = useParams(); // Get the blog ID from the URL
+  const [isSaving, setIsSaving] = useState(false); 
+    const [categories, setCategories] = useState([]); // Loading state for save button
+
+  const { id } = useParams();
+  console.log("id", id); // Get the blog ID from the URL
   const navigate = useNavigate();
   const [blog, setBlog] = useState({
     category: "",
@@ -18,6 +24,20 @@ const EditBlog = () => {
     date: "",
     status: "",
   });
+
+    useEffect(() => {
+      const fetchCategories = async () => {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/blogCategory/all`
+          );
+          setCategories(response.data); // Assuming response.data is an array of categories
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      };
+      fetchCategories();
+    }, []);
 
   // Fetch the blog data when the component mounts
   useEffect(() => {
@@ -35,6 +55,7 @@ const EditBlog = () => {
         });
       } catch (error) {
         console.error("Error fetching blog:", error);
+        toast.error("Failed to fetch blog data.");
       }
     };
     fetchBlog();
@@ -60,6 +81,7 @@ const EditBlog = () => {
 
   // Save the updated blog
   const handleSave = async () => {
+    setIsSaving(true)
     try {
       const formData = new FormData();
       Object.keys(blog).forEach((key) => {
@@ -69,6 +91,9 @@ const EditBlog = () => {
           formData.append(key, blog[key]);
         }
       });
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
       const res = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/blogs/update/${id}`,
@@ -80,9 +105,13 @@ const EditBlog = () => {
         }
       );
       console.log("updated", res);
-      navigate("/blog-list"); // Redirect to the blog list after saving
+       toast.success("Blog updated successfully!"); // Show success toast
+      //  navigate("/blog-list");
+      // navigate("/blog-list"); // Redirect to the blog list after saving
     } catch (error) {
       console.error("Error updating blog:", error);
+    }finally{
+      setIsSaving(false)
     }
   };
 
@@ -91,8 +120,16 @@ const EditBlog = () => {
     navigate(-1);
   };
 
+    const handleCategoryChange = (e) => {
+      setBlog((prevBlog) => ({
+        ...prevBlog,
+        category: e.target.value,
+      }));
+    };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      <ToastContainer />
       <button
         onClick={handleGoBack}
         className="mb-4 ml-[2vw] bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-all duration-300"
@@ -104,13 +141,19 @@ const EditBlog = () => {
         {/* Category */}
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">Category</label>
-          <input
-            type="text"
+          <select
             name="category"
             value={blog.category || ""}
-            onChange={handleChange}
+            onChange={handleCategoryChange}
             className="border px-3 py-2 rounded w-full"
-          />
+          >
+            <option value="">Select a Category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Name */}
@@ -172,13 +215,13 @@ const EditBlog = () => {
             className="border px-3 py-2 rounded w-full"
             accept="image/*"
           />
-          {blog.blogImage && (
-            <img
-              src={URL.createObjectURL(blog.blogImage)} // Preview the selected file
-              alt="Blog Preview"
-              className="mt-2 w-20 h-20 rounded-lg object-cover"
-            />
-          )}
+       {blog.blogImage && (
+  <img
+    src={typeof blog.blogImage === "string" ? blog.blogImage : URL.createObjectURL(blog.blogImage)}
+    alt="Blog Preview"
+    className="mt-2 w-20 h-20 rounded-lg object-cover"
+  />
+)}
         </div>
 
         {/* Author Image */}
@@ -254,7 +297,7 @@ const EditBlog = () => {
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
           onClick={handleSave}
         >
-          Save
+          {isSaving ? "Saving..." : "Save"}
         </button>
       </div>
     </div>
