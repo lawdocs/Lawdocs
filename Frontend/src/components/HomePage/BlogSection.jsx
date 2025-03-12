@@ -1,8 +1,27 @@
+import { useEffect, useState } from "react";
 import { Card } from "../ui/card";
-import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function BlogSection() {
+  const [trendingBlogs, setTrendingBlogs] = useState([]); // State to store trending blogs
+
+  // Fetch trending blogs from the backend
+  useEffect(() => {
+    const fetchTrendingBlogs = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/blogs/trending`
+        );
+        console.log("res",response);
+        setTrendingBlogs(response.data.blogs); // Assuming the API returns { blogs: [...] }
+      } catch (error) {
+        console.error("Error fetching trending blogs:", error);
+      }
+    };
+    fetchTrendingBlogs();
+  }, []);
+
   return (
     <section className="py-16 bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] shadow-xl">
       <div className="container mx-auto text-center px-6 md:px-12">
@@ -10,55 +29,35 @@ function BlogSection() {
           Trending Topics
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              title:
-                "Intellectual Property Rights Made Easy: A Guide for Small Businesses",
-              description: "A guide for small businesses.",
-              image: "public/assets/Blogs/Blog6.webp",
-              link: "/blog/intellectual-property-rights", // Add a link for navigation
-            },
-            {
-              title:
-                "Why Every Business Needs a Business Partnership Agreement: Key Benefits and Legal Protection",
-              description: "Key benefits and legal protection.",
-              image: "public/assets/Blogs/Blog8.webp",
-              link: "/blog/business-partnership-agreement", // Add a link for navigation
-            },
-            {
-              title:
-                "Non-Disclosure Agreements: Protecting Confidentiality and Minimizing Legal Risks",
-              description: "Protecting confidentiality.",
-              image: "assets/Blogs/Blog9.webp",
-              link: "/blog/non-disclosure-agreements", // Add a link for navigation
-            },
-          ].map((blog, index) => (
+          {trendingBlogs.map((blog) => (
             <Card
-              key={index}
+              key={blog._id}
               className="overflow-hidden rounded-xl shadow-lg bg-white text-left transition-all duration-300 hover:shadow-2xl hover:scale-105"
             >
               {/* Clickable Image */}
-              <Link to={blog.link}>
+              <Link to={`/blogs-Details/${blog._id}`}>
                 <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full h-[15vw] object-cover cursor-pointer"
+                  src={blog.blogImage}
+                  alt={blog.name}
+                  className="w-[40vw] h-[20vw] object-contain cursor-pointer"
                 />
               </Link>
               <div className="p-6">
                 {/* Clickable Title */}
-                <Link to={blog.link}>
+                <Link to={`/blogs-Details/${blog._id}`}>
                   <h3 className="text-xl font-semibold mb-4 text-gray-900 line-clamp-2 cursor-pointer hover:text-blue-600">
-                    {blog.title}
+                    {blog.name}
                   </h3>
                 </Link>
-                <p className="mb-4 text-gray-600">{blog.description}</p>
+                <p className="mb-4 text-gray-600 line-clamp-3">
+                  {blog.description.replace(/<[^>]+>/g, "")}
+                </p>
                 <Link
-                    to=""
-                    className="text-[#1E3A8A] p-0 font-semibold"
-                  >
-                    Read More →
-                  </Link>
+                  to={`/blogs-Details/${blog._id}`}
+                  className="text-[#1E3A8A] p-0 font-semibold"
+                >
+                  Read More →
+                </Link>
               </div>
             </Card>
           ))}
