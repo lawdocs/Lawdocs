@@ -10,6 +10,8 @@ import Blogs from "./Pages/Blogs/Blogs";
 import BlogsDetails from "./Pages/Blogs/BlogsDetails";
 import Team from "./Pages/Team/Team";
 import TeamDetails from "./Pages/Team/TeamDetails";
+import DraftsPage from "./Pages/Drafts/DraftsPage";
+import LegalPage from "./Pages/LegalResources/LegalPage.jsx";
 import Layout from "./Layout/Layout";
 import App1 from "../../Frontend/Admin/src/App1";
 import AddBlog from "./Pages/Blogs/AddBlog";
@@ -64,7 +66,8 @@ function App() {
               <Route path="/team" element={<Team />} />
               <Route path="/team-details" element={<TeamDetails/>} />
               <Route path="/demo-page" element={<DemoPage/>} />
-              
+              <Route path="/drafts" element={<DraftsPage />} />
+              <Route path="/legal" element={<LegalPage />} />
               <Route
                 path="/about"
                 element={

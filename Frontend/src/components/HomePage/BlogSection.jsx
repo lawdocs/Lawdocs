@@ -13,7 +13,7 @@ function BlogSection() {
         const response = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/trending`
         );
-        console.log("res",response);
+        console.log("res", response);
         setTrendingBlogs(response.data.blogs); // Assuming the API returns { blogs: [...] }
       } catch (error) {
         console.error("Error fetching trending blogs:", error);
@@ -39,7 +39,7 @@ function BlogSection() {
                 <img
                   src={blog.blogImage}
                   alt={blog.name}
-                  className="w-[40vw] h-[20vw] object-contain cursor-pointer"
+                  className="w-full h-48 object-cover cursor-pointer"
                 />
               </Link>
               <div className="p-6">
@@ -49,9 +49,14 @@ function BlogSection() {
                     {blog.name}
                   </h3>
                 </Link>
-                <p className="mb-4 text-gray-600 line-clamp-3">
+                {/* Description with 2 lines */}
+                <p className="mb-4 text-gray-600 line-clamp-2">
                   {blog.description.replace(/<[^>]+>/g, "")}
                 </p>
+                <div className="text-sm text-gray-500 mb-4">
+                  <span>By {blog.authorName}</span> |{" "}
+                  <span>{new Date(blog.date).toLocaleDateString()}</span>
+                </div>
                 <Link
                   to={`/blogs-Details/${blog._id}`}
                   className="text-[#1E3A8A] p-0 font-semibold"

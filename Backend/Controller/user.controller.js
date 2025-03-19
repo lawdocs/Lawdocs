@@ -13,6 +13,8 @@ try{
     // console.log("daatat",clerkId, );
     // console.log("daatat",clerkId, );
         let user=await User.findOne({clerkId});
+        console.log("clerküser",user)
+
 
         if(!user){
             user = new User({
@@ -21,6 +23,7 @@ try{
               username,
               phoneNumber,
             });
+            console.log("user",user)
             await user.save()
         }
         res.status(200).json({message:"User saved successfully",user})

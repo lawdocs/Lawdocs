@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import {
@@ -10,24 +10,6 @@ import {
 
 function Work() {
   const companyNames = [
-    "Arriba_Logo",
-    "bazaari-finnance",
-    "bhanix-finance-logo",
-    "jain-finance",
-    "Kannattu",
-    "Amarpadma",
-    "muthootfincorplogo",
-    "RGSPL",
-    "Standard-Capital",
-    "Arriba_Logo",
-    "bazaari-finnance",
-    "bhanix-finance-logo",
-    "jain-finance",
-    "Kannattu",
-    "Amarpadma",
-    "muthootfincorplogo",
-    "RGSPL",
-    "Standard-Capital",
     "Arriba_Logo",
     "bazaari-finnance",
     "bhanix-finance-logo",
@@ -51,7 +33,7 @@ function Work() {
   return (
     <div ref={ref} className="font-['Inter'] w-full bg-gray-50">
       {/* Trusted Companies Section */}
-      <div className="bg-gray-100 py-16 px-6 text-center">
+      <div className="bg-gray-100 py-12 px-4 sm:px-6 md:px-12 text-center">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={controls}
@@ -59,20 +41,21 @@ function Work() {
             hidden: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0, transition: { duration: 1 } },
           }}
-          className="text-4xl md:text-4xl font-playfair font-extrabold text-gray-700"
+          className="text-3xl md:text-4xl font-playfair font-extrabold text-gray-700"
         >
           Trusted by Industry Leaders
         </motion.h2>
+
         {/* Infinite Scrolling Logos */}
         <div className="relative w-full overflow-hidden mt-8">
-          <div className="bg-white py-6 rounded-lg shadow-md">
-            <div className="marquee flex lg:h-[5vw]">
+          <div className="bg-white py-4 sm:py-6 rounded-lg shadow-md">
+            <div className="marquee flex h-[12vw] sm:h-[8vw] md:h-[5vw] items-center">
               {[...companyNames, ...companyNames].map((logo, index) => (
                 <img
                   key={index}
                   src={`assets/Clients/${logo}.png`}
                   alt={logo}
-                  className="object-contain w-20 md:w-28 h-14 md:h-20 opacity-80 hover:opacity-100 transition mx-4"
+                  className="object-contain w-20 sm:w-24 md:w-28 h-12 sm:h-16 md:h-20 opacity-80 hover:opacity-100 transition mx-4"
                 />
               ))}
             </div>
@@ -81,7 +64,7 @@ function Work() {
       </div>
 
       {/* Document Drafting Section */}
-      <div className="relative bg-white bg-gradient-to-br  from-[#F9FAFB] to-[#E5E7EB] text-gray-900 py-20 px-6 md:px-24 rounded-lg shadow-lg">
+      <div className="relative bg-white bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] text-gray-900 py-16 px-4 sm:px-8 md:px-24 rounded-lg shadow-lg">
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -92,13 +75,13 @@ function Work() {
           }}
           className="relative max-w-4xl mx-auto text-center"
         >
-          <h3 className="font-playfair font-extrabold text-4xl md:text-5xl uppercase tracking-wider relative inline-block">
+          <h3 className="font-playfair font-extrabold text-3xl sm:text-4xl md:text-5xl uppercase tracking-wider relative inline-block">
             Document Drafting & Review Service
-            <span className="absolute left-0 top-[7vw] bottom-0 w-full h-1 bg-blue-600 "></span>
+            <span className="absolute left-1/2 -translate-x-1/2 mt-3 block w-24 sm:w-36 h-1 bg-blue-600"></span>
           </h3>
-          <p className="text-gray-600 mt-6 text-lg md:text-xl leading-relaxed">
+          <p className="text-gray-600 mt-8 text-base sm:text-lg md:text-xl leading-relaxed">
             Legal documentation plays a vital role in ensuring business
-            compliance and smooth operations. Our expert team specializes in
+            compliance and smooth operations. Our expert team specializes in{" "}
             <span className="font-semibold text-gray-800">
               drafting well-structured, clear, and enforceable contracts.
             </span>
@@ -106,7 +89,7 @@ function Work() {
         </motion.div>
 
         {/* Steps Section */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
               icon: <FaFileContract className="text-blue-500 text-4xl" />,
@@ -147,7 +130,7 @@ function Work() {
         {`
           .marquee {
             display: flex;
-            gap: 4vw;
+            gap: 6vw;
             min-width: 200%;
             animation: marquee 15s linear infinite;
           }
@@ -160,6 +143,7 @@ function Work() {
           @media (max-width: 768px) {
             .marquee {
               animation: marquee 20s linear infinite;
+              gap: 10vw;
             }
           }
         `}

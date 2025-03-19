@@ -20,14 +20,12 @@ function BlogPage() {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/blogs/getApprovedBlogs`
         );
-        console.log("response",res.data.approvedBlogs);
+        console.log("response", res.data.approvedBlogs);
         setBlogs(res.data.approvedBlogs);
 
         const uniqueCategories = [
           "All",
-          ...new Set(
-            res.data.approvedBlogs.map((blog) => blog.category)
-          ),
+          ...new Set(res.data.approvedBlogs.map((blog) => blog.category)),
         ];
         setCategories(uniqueCategories);
       } catch (error) {
@@ -124,24 +122,42 @@ function BlogPage() {
                   <img
                     src={blog.blogImage}
                     alt={blog.name}
-                    className="w-full h-64 object-contain cursor-pointer" // Adjusted image height for better visibility
+                    className="w-full h-48 object-cover cursor-pointer"
                   />
                 </Link>
+
+                {/* Author and Date Section */}
+                <div className="px-6 pt-4 pb-2 bg-gray-50 border-b border-gray-200">
+                  <div className="flex items-center text-gray-600 space-x-2">
+                    <p className="text-sm font-semibold hover:text-blue-600 transition-all duration-300 cursor-pointer">
+                      By {blog.authorName}
+                    </p>
+                    <span className="text-gray-400">|</span>
+                    <p className="text-sm">
+                      {new Date(blog.date).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Blog Content */}
                 <div className="p-6">
                   {/* Clickable Title */}
                   <Link to={`/blogs-Details/${blog._id}`}>
-                    <h3 className="text-xl font-semibold mb-4 text-gray-900 line-clamp-2 cursor-pointer hover:text-blue-600">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-900 cursor-pointer hover:text-blue-600 line-clamp-2">
                       {blog.name}
                     </h3>
                   </Link>
 
-                  {/* Blog Date and Author */}
-                  <div className=" text-gray-500 mb-4 flex  items-center space-x-9">
-                    <p className="text-gray-700 text-[1vw] font-medium">By {blog.authorName}</p>
-                    <span className="text-gray-400">•</span>
-                    <p> Published On {new Date(blog.date).toLocaleDateString()}</p>
-                  </div>
+                  {/* Short Description */}
+                  <p className="mb-4 text-gray-600 line-clamp-2">
+                    {blog.description.replace(/<[^>]+>/g, "")}
+                  </p>
 
+                  {/* Read More Link */}
                   <Link
                     to={`/blogs-Details/${blog._id}`}
                     className="text-[#1E3A8A] p-0 font-semibold"
